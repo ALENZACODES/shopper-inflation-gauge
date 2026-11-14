@@ -1,4 +1,6 @@
 let cpi = null;
+let cpiHistory = null;
+const modelCache = {};
 
 const SAMPLE = {
   label: "Labelled demo month, not a real household",
@@ -92,6 +94,7 @@ function renderFields(geoName) {
 
 function renderResult(geoName, amounts, usedSample) {
   const out = compute(geoName, amounts);
+  renderModel(geoName, amounts);
   document.getElementById("total").textContent = money(out.total);
   const kpis = document.getElementById("kpis");
   if (out.total <= 0) {
@@ -134,6 +137,42 @@ function renderResult(geoName, amounts, usedSample) {
   return out;
 }
 
+function modelFor(geoName) {
+  if (!cpiHistory || !window.GaugeModel) return null;
+  if (!modelCache[geoName]) {
+    const ids = cpi.geographies[geoName].categories.map((c) => c.id);
+    modelCache[geoName] = window.GaugeModel.learnWeights(cpiHistory.geographies[geoName], ids, { lambda: 1, holdout: 12 });
+  }
+  return modelCache[geoName];
+}
+
+function renderModel(geoName, amounts) {
+  const m = modelFor(geoName);
+  const summary = document.getElementById("model-summary");
+  if (!m) {
+    summary.textContent = "Model data did not load.";
+    return;
+  }
+  const cats = cpi.geographies[geoName].categories;
+  const total = amounts ? cats.reduce((s, c) => s + (amounts[c.id] || 0), 0) : 0;
+  const learnedSum = m.weights.reduce((s, w) => s + w, 0);
+  summary.textContent =
+    `Trained on ${m.trainMonths[0]} to ${m.trainMonths[1]} for ${geoName}, then tested on ${m.testMonths[0]} to ${m.testMonths[1]}. ` +
+    `On those unseen months its all-items rate was off by ${m.testMAE.toFixed(2)} percentage points on average. ` +
+    `The learned weights add up to ${(learnedSum * 100).toFixed(1)}%, close to the 100% a real basket would have, even though the model was never told the basket.`;
+  document.querySelector("#model-table tbody").innerHTML = cats
+    .map((c, i) => {
+      const share = total > 0 ? ((amounts[c.id] || 0) / total) * 100 : null;
+      return `<tr>
+        <td>${c.label}</td>
+        <td>${(m.weights[i] * 100).toFixed(1)}%</td>
+        <td>${c.weight_2025.toFixed(2)}%</td>
+        <td>${share === null ? "n/a" : share.toFixed(1) + "%"}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
 function currentAmounts() {
   const geo = document.getElementById("geo").value;
   return readAmounts(cpi.geographies[geo].categories);
@@ -161,6 +200,12 @@ async function init() {
     return;
   }
   cpi = await res.json();
+  try {
+    const hr = await fetch("data/cpi-history.json");
+    if (hr.ok) cpiHistory = await hr.json();
+  } catch (err) {
+    cpiHistory = null;
+  }
   const t = cpi.toronto_all_items;
   document.getElementById("data-meta").textContent =
     `Latest month in the bundled file is ${cpi.latest_month}. Retrieved ${cpi.retrieved} (${cpi.retrieved_zone}). Indexes are not seasonally adjusted, 2002=100.`;
@@ -171,9 +216,9 @@ async function init() {
     <li><a href="${cpi.basket_table.url}">${cpi.basket_table.title}</a> (table ${cpi.basket_table.id}), 2025 basket, ${cpi.basket_table.price_period}, ${cpi.basket_table.geographic_distribution}.</li>
     <li>CSV packages: <a href="${cpi.index_table.download}">${cpi.index_table.download}</a> and <a href="${cpi.basket_table.download}">${cpi.basket_table.download}</a>.</li>`;
   renderFields(document.getElementById("geo").value);
+  renderModel(document.getElementById("geo").value, null);
   document.getElementById("geo").addEventListener("change", () => {
-    const prev = {};
-    // keep numbers already typed if switching geo: fields are recreated
+    renderModel(document.getElementById("geo").value, null);
     renderFields(document.getElementById("geo").value);
   });
   let usedSample = false;

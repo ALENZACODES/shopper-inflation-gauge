@@ -63,6 +63,25 @@
       </div>
       <p class="hint">Contribution is your share of spending multiplied by that category’s twelve-month change. The two rows that add the most are highlighted. Official basket weights are the 2025 CPI weights at basket link month prices, for the geography you picked.</p>
     </section>
+    <section class="card" style="margin-top:1rem;" aria-labelledby="model-title">
+      <h2 id="model-title">What a small model learns from five years of price changes</h2>
+      <p class="meta">A ridge regression, trained in your browser, looks only at monthly twelve-month changes for the eight groups and for all-items. It learns how much each group moves the headline rate. Those learned weights are then compared with the official 2025 basket weights, and the model is scored on the last 12 months, which it never saw during training.</p>
+      <p id="model-summary" aria-live="polite"></p>
+      <div style="overflow-x:auto;">
+        <table id="model-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Learned weight</th>
+              <th>Official basket</th>
+              <th>Your share</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="hint">This model explains the past. It does not forecast prices. Basket weights change when Statistics Canada updates the basket, so learned weights blend several basket years.</p>
+    </section>
     <section class="sources">
       <h2>Sources</h2>
       <ul class="clean" id="source-list"></ul>
@@ -71,6 +90,7 @@
   <footer class="wrap">
     <p>Solo project by John Khan, Toronto, Ontario. Figures come from Statistics Canada public tables. This page does not forecast prices and is not financial advice.</p>
   </footer>
+  <script src="model.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

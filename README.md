@@ -15,6 +15,7 @@ Live demo: https://alenzacodes.github.io/shopper-inflation-gauge/
 - Personal weighted rate, official all-items rate, and the gap between them
 - Category table with your share, the official basket share, and each group's contribution
 - Toronto all-items rate shown only as context, because the city series has no eight-group split in this table
+- A ridge regression trained in the browser on five years of price changes, which learns each group's weight in the all-items rate and is scored on the last 12 months it never saw
 - A labelled demo month that is not a real household
 - No accounts and no invented index values
 
@@ -32,9 +33,18 @@ Open http://localhost:8080/.
 
 ```bash
 node tests/test_cpi.mjs
+node tests/test_model.mjs
 ```
 
 Checks the bundled September 2026 indexes and 12-month changes against the official extract, and checks that basket weights sum to 100.
+
+## Refresh the model data
+
+```bash
+python3 scripts/fetch_history.py
+```
+
+Downloads 72 months of index values for the eight groups and all-items (October 2020 to September 2026 in the saved copy) into `site/data/cpi-history.json`.
 
 ## Data sources
 
