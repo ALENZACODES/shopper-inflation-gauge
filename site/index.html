@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Khan" />
+  <meta name="description" content="Shopper Inflation Gauge weights Statistics Canada CPI category changes by your own monthly spending." />
+  <link rel="icon" href="data:," />
+  <title>Shopper Inflation Gauge · Your basket, official prices</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="banner">
+    <div class="banner-inner">
+      <h1>Shopper Inflation Gauge</h1>
+      <p>Enter what you spend each month in the eight major CPI groups. The page applies official twelve-month price changes from Statistics Canada and shows your rate beside the published all-items rate, plus the two groups that add the most to yours.</p>
+      <span class="pill">Built for ML Empowerment Build Challenge 4.0</span>
+    </div>
+  </header>
+  <main id="main" class="wrap">
+    <section class="card" aria-labelledby="in-title">
+      <h2 id="in-title">Your monthly spending</h2>
+      <p class="meta" id="data-meta"></p>
+      <div class="row two">
+        <div>
+          <label for="geo">Price geography</label>
+          <select id="geo">
+            <option value="Ontario" selected>Ontario</option>
+            <option value="Canada">Canada</option>
+          </select>
+        </div>
+        <div>
+          <p class="hint" style="margin-top:1.6rem;">Amounts are in Canadian dollars, as a typical month. Leave a group at 0 if you do not spend there. A demo set is labelled as fiction and is only for trying the page.</p>
+        </div>
+      </div>
+      <div id="spend-fields" class="row two"></div>
+      <p><strong>Total entered: $<span id="total">0.00</span></strong></p>
+      <button id="run" type="button">Work out my rate</button>
+      <button id="sample" type="button" class="secondary">Fill a labelled demo month</button>
+      <button id="clear" type="button" class="secondary">Clear amounts</button>
+    </section>
+    <section class="card" style="margin-top:1rem;" aria-labelledby="out-title">
+      <h2 id="out-title">Your rate compared with the official rate</h2>
+      <div class="kpi" id="kpis"></div>
+      <p id="story" aria-live="polite"></p>
+      <div class="note" id="toronto-note"></div>
+      <h3>Category detail</h3>
+      <div style="overflow-x:auto;">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Your spend</th>
+              <th>Your share</th>
+              <th>Official basket</th>
+              <th>12-month change</th>
+              <th>Contribution to your rate</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="hint">Contribution is your share of spending multiplied by that category’s twelve-month change. The two rows that add the most are highlighted. Official basket weights are the 2025 CPI weights at basket link month prices, for the geography you picked.</p>
+    </section>
+    <section class="sources">
+      <h2>Sources</h2>
+      <ul class="clean" id="source-list"></ul>
+    </section>
+  </main>
+  <footer class="wrap">
+    <p>Solo project by John Khan, Toronto, Ontario. Figures come from Statistics Canada public tables. This page does not forecast prices and is not financial advice.</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
