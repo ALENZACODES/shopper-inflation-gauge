@@ -46,6 +46,30 @@ python3 scripts/fetch_history.py
 
 Downloads 72 months of index values for the eight groups and all-items (October 2020 to September 2026 in the saved copy) into `site/data/cpi-history.json`.
 
+## Project structure
+
+```text
+shopper-inflation-gauge/
+├── .github/
+│   └── workflows/        # CI workflows (1 file)
+├── scripts/
+│   └── fetch_history.py  # Downloads monthly CPI history
+├── site/                 # The app
+│   ├── data/             # CPI data (2 files)
+│   ├── app.js            # Interface logic
+│   ├── index.html        # Page markup
+│   ├── model.js          # Linear model of how each CPI group moves the all-items rate
+│   └── styles.css        # Styles
+├── tests/                # Automated tests
+│   ├── test_cpi.mjs
+│   └── test_model.mjs
+├── .gitignore
+├── DEVPOST.md            # Submission write-up
+├── IDEA.md               # Original idea note
+├── LICENSE               # Licence
+└── README.md             # This file
+```
+
 ## Data sources
 
 - Statistics Canada table 18-10-0004-01, Consumer Price Index, monthly, not seasonally adjusted: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401
